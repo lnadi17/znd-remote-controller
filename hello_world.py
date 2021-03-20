@@ -5,8 +5,8 @@
 
 from RsInstrument.RsInstrument import RsInstrument
 
-resource_string_1 = 'TCPIP::192.168.0.100::INSTR'  # Standard LAN connection (also called VXI-11)
-resource_string_2 = 'TCPIP::192.168.0.100::hislip0'  # Hi-Speed LAN connection - see 1MA208
+resource_string_1 = 'TCPIP::192.168.0.101::INSTR'  # Standard LAN connection (also called VXI-11)
+resource_string_2 = 'TCPIP::192.168.0.101::hislip0'  # Hi-Speed LAN connection - see 1MA208
 resource_string_3 = 'GPIB::20::INSTR'  # GPIB Connection
 resource_string_4 = 'USB::0x0AAD::0x0119::022019943::INSTR'  # USB-TMC (Test and Measurement Class)
 resource_string_5 = 'RSNRP::0x0095::104015::INSTR'  # R&S Powersensor NRP-Z86
@@ -44,6 +44,20 @@ instr.write_str("initiate1:continuous off")
 # start of the sweeps (is default setting).
 #instr.write_str("sense1:sweep:time:auto on")
 #instr.write_str("trigger1:sequence:source immediate")
+
+# See calibration state (CAL=calibrated, CAI=calibrated but interpolated, etc.)
+#instr.query_str("correction:state?")
+
+# Write current trace to new memory
+instr.write_str("trace:copy 'MemoryTrace1', 'MainTrace'")
+# Display memory trace on screen (MemoryTrace1 as trace #2)
+instr.write_str("display:window:trace2:feed 'MemoryTrace1'")
+
+# Save all traces from channel 1 to file
+instr.write_str("mmemory:store:trace:channel 1, 'C:\\Users\\Instrument\\Desktop\\HelloWorld.dat', formatted, complex, point, semicolon")
+
+# Load calibration data
+instr.write_str("mmemory:load:correction 1, 'SMA Ideal.cal'")
 
 # Close the session
 instr.close()
