@@ -42,6 +42,9 @@ class Instrument:
     def create_trace(self, channel: int, name: str, result: str):
         self.write("calculate{}:parameter:sdefine '{}', '{}'".format(channel, name, result))
 
+    def set_touchscreen_lock(self, ts_lock_mode: str):
+        self.write("system:tslock {}".format(ts_lock_mode))
+
     def set_trace_points(self, channel: int, points: int):
         self.write("sense{}:sweep:points {}".format(channel, points))
 
