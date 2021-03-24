@@ -29,7 +29,7 @@ class Instrument:
     def correction_state(self):
         return self.query("correction:state?")
 
-    def set_display_mode(self, display_mode: str):
+    def set_display_mode(self, display_mode: Types.DisplayMode):
         self.write(f"system:display:update {display_mode}")
         # self.write("initiate1:continuous off")
 
@@ -42,7 +42,7 @@ class Instrument:
     def create_trace(self, channel: int, name: str, result: str):
         self.write(f"calculate{channel}:parameter:sdefine '{name}', '{result}'")
 
-    def set_touchscreen_lock(self, ts_lock_mode: str):
+    def set_touchscreen_lock(self, ts_lock_mode: Types.TSLockMode):
         self.write(f"system:tslock {ts_lock_mode}")
 
     def set_trace_points(self, channel: int, points: int):
@@ -65,9 +65,9 @@ class Instrument:
 
     def save_all_traces(self, channel: int, path: 'str',
                         formatted: bool = True,
-                        save_format: str = Types.SaveFormat.COMPLEX,
-                        dec_separator: str = Types.DecimalSeparator.POINT,
-                        field_separator: str = Types.FieldSeparator.SEMICOLON):
+                        save_format: Types.SaveFormat = Types.SaveFormat.COMPLEX,
+                        dec_separator: Types.DecimalSeparator = Types.DecimalSeparator.POINT,
+                        field_separator: Types.FieldSeparator = Types.FieldSeparator.SEMICOLON):
         formatted = 'formatted' if formatted else 'unformatted'
         self.write(
             f"mmemory:store:trace:channel {channel}, '{path}', {formatted}, {save_format}, {dec_separator}, {field_separator}")
