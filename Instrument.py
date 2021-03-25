@@ -1,16 +1,26 @@
+from typing import Callable
+import threading
 from RsInstrument.RsInstrument import RsInstrument
+from ButtonThread import ButtonThread
 import Types
 
 
 class Instrument:
     def __init__(self, resource_string: str):
         self.instr = RsInstrument(resource_string, True, False)
+        self.button_callbacks = {}
+        self.button_semaphore = threading.Semaphore()
+        self.button_listen = threading.Event()
+        self.button_thread = ButtonThread(self.button_listen, self.button_semaphore, self, self.button_callbacks)
+        self.button_thread.start()
 
     def write(self, command: str):
-        self.instr.write_str_with_opc(command)
+        with self.button_semaphore:
+            self.instr.write_str_with_opc(command)
 
     def query(self, command: str):
-        return self.instr.query_str_with_opc(command)
+        with self.button_semaphore:
+            return self.instr.query_str_with_opc(command)
 
     def greet(self):
         idn = self.query("*IDN?")
@@ -19,6 +29,24 @@ class Instrument:
         print(f"Visa manufacturer: {self.instr.visa_manufacturer}")
         print(f"Instrument full name: {self.instr.full_instrument_model_name}")
         print(f"Instrument installed options: {','.join(self.instr.instrument_options)}")
+
+    # Button
+    def button_define(self, key: Types.KeyNumber, name: str, callback: Callable):
+        self.write(f"system:user:key {key}, 'User {name}'")
+        self.button_callbacks[key] = callback
+
+    def button_query(self) -> Types.KeyNumber:
+        key = int(self.query(f"system:user:key?")[0])
+        return None if key == 0 else Types.KeyNumber(key)
+
+    def button_clear_all(self):
+        self.write("system:user:key 0")
+
+    def button_start_listening(self):
+        self.button_listen.set()
+
+    def button_stop_listening(self):
+        self.button_listen.clear()
 
     # Instrument Settings
     def reset(self):
