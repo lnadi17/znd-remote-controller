@@ -31,7 +31,7 @@ class FieldSeparator(Enum):
     SPACE = 'space'
 
 
-class KeyNumber(Enum):
+class ButtonNumber(Enum):
     ONE = 1
     TWO = 2
     THREE = 3

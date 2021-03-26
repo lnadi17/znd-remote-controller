@@ -1,7 +1,6 @@
 from typing import Callable
 import threading
 from RsInstrument.RsInstrument import RsInstrument
-from ButtonThread import ButtonThread
 import Types
 
 
@@ -31,13 +30,13 @@ class Instrument:
         print(f"Instrument installed options: {','.join(self.instr.instrument_options)}")
 
     # Button
-    def button_define(self, key: Types.KeyNumber, name: str, callback: Callable):
+    def button_define(self, key: Types.ButtonNumber, name: str, callback: Callable):
         self.write(f"system:user:key {key}, 'User {name}'")
         self.button_callbacks[key] = callback
 
-    def button_query(self) -> Types.KeyNumber:
+    def button_query(self) -> Types.ButtonNumber:
         key = int(self.query(f"system:user:key?")[0])
-        return None if key == 0 else Types.KeyNumber(key)
+        return None if key == 0 else Types.ButtonNumber(key)
 
     def button_clear_all(self):
         self.write("system:user:key 0")
@@ -108,3 +107,21 @@ class Instrument:
         formatted = 'formatted' if formatted else 'unformatted'
         self.write(
             f"mmemory:store:trace:channel {channel}, '{path}', {formatted}, {save_format}, {dec_separator}, {field_separator}")
+
+
+class ButtonThread(threading.Thread):
+    def __init__(self, listen: threading.Event, semaphore: threading.Semaphore, instrument: Instrument, callbacks: dict):
+        threading.Thread.__init__(self)
+        self.semaphore = semaphore
+        self.instrument = instrument
+        self.callbacks = callbacks
+        self.listen = listen
+
+    def run(self):
+        while True:
+            self.listen.wait()
+            while self.listen.is_set():
+                with self.semaphore:
+                    key = self.instrument.button_query()
+                    if key is not None:
+                        self.callbacks[key]()
