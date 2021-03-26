@@ -31,7 +31,7 @@ class Instrument:
 
     # Button
     def button_define(self, key: Types.ButtonNumber, name: str, callback: Callable):
-        self.write(f"system:user:key {key}, 'User {name}'")
+        self.write(f"system:user:key {key.value}, 'User {name}'")
         self.button_callbacks[key] = callback
 
     def button_query(self) -> Types.ButtonNumber:
@@ -51,9 +51,6 @@ class Instrument:
     def reset(self):
         self.instr.reset()
 
-    def close(self):
-        self.instr.close()
-
     def set_visa_timeout(self, timeout: int):
         self.instr.visa_timeout = timeout
 
@@ -61,16 +58,15 @@ class Instrument:
         self.instr.instrument_status_checking = status_checking
 
     # Correction
-    def correction_state(self):
-        return self.query("correction:state?")
+    def correction_state(self, channel: int = 1):
+        return self.query(f"sense{channel}:correction:sstate?")
 
     def correction_load(self, channel: int, file_name: str):
         self.write(f"mmemory:load:correction {channel}, '{file_name}'")
 
     # Display
     def display_set_mode(self, display_mode: Types.DisplayMode):
-        self.write(f"system:display:update {display_mode}")
-        # self.write("initiate1:continuous off")
+        self.write(f"system:display:update {display_mode.value}")
 
     # Window
     def window_create(self, window_id: int):
@@ -81,14 +77,14 @@ class Instrument:
 
     # Touchscreen
     def touchscreen_set_lock(self, ts_lock_mode: Types.TSLockMode):
-        self.write(f"system:tslock {ts_lock_mode}")
+        self.write(f"system:tslock {ts_lock_mode.value}")
 
     # Traces
     def trace_create(self, channel: int, name: str, result: str):
         self.write(f"calculate{channel}:parameter:sdefine '{name}', '{result}'")
 
     def trace_rename(self, trace_id: int, trace_name: str):
-        self.write(f"configure:trace{trace_id}:name {trace_name}")
+        self.write(f"configure:trace{trace_id}:name '{trace_name}'")
 
     def trace_set_points(self, channel: int, points: int):
         self.write(f"sense{channel}:sweep:points {points}")
@@ -99,18 +95,20 @@ class Instrument:
     def trace_assign_to_window(self, window_id: int, trace_id: int, trace_name: str):
         self.write(f"display:window{window_id}:trace{trace_id}:feed '{trace_name}'")
 
-    def traces_save_all(self, channel: int, path: 'str',
-                        formatted: bool = True,
-                        save_format: Types.SaveFormat = Types.SaveFormat.COMPLEX,
-                        dec_separator: Types.DecimalSeparator = Types.DecimalSeparator.POINT,
-                        field_separator: Types.FieldSeparator = Types.FieldSeparator.SEMICOLON):
+    def trace_save_all(self, channel: int, path: 'str',
+                       formatted: bool = True,
+                       save_format: Types.SaveFormat = Types.SaveFormat.COMPLEX,
+                       dec_separator: Types.DecimalSeparator = Types.DecimalSeparator.POINT,
+                       field_separator: Types.FieldSeparator = Types.FieldSeparator.SEMICOLON):
         formatted = 'formatted' if formatted else 'unformatted'
         self.write(
-            f"mmemory:store:trace:channel {channel}, '{path}', {formatted}, {save_format}, {dec_separator}, {field_separator}")
+            f"mmemory:store:trace:channel {channel}, '{path}', {formatted}, "
+            f"{save_format.value}, {dec_separator.value}, {field_separator.value}")
 
 
 class ButtonThread(threading.Thread):
-    def __init__(self, listen: threading.Event, semaphore: threading.Semaphore, instrument: Instrument, callbacks: dict):
+    def __init__(self, listen: threading.Event, semaphore: threading.Semaphore, instrument: Instrument,
+                 callbacks: dict):
         threading.Thread.__init__(self)
         self.semaphore = semaphore
         self.instrument = instrument

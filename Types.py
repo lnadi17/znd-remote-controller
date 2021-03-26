@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class DisplayMode(Enum):
-    CONTINUOUS = "on"
+    ON = "on"
     ONCE = "once"
     OFF = "off"
 
