@@ -40,3 +40,8 @@ class ButtonNumber(Enum):
     SIX = 6
     SEVEN = 7
     EIGHT = 8
+
+
+class SweepMode(Enum):
+    CONTINUOUS = "on"
+    SINGLE = "off"
