@@ -10,15 +10,24 @@ class Instrument:
         self.button_callbacks = {}
         self.button_semaphore = threading.Semaphore()
         self.button_listen = threading.Event()
-        self.button_thread = ButtonThread(self.button_listen, self.button_semaphore, self, self.button_callbacks)
+        self.lock_main_thread = threading.Event()
+        self.lock_main_thread.set()
+        self.button_thread = ButtonThread(self.button_listen, self.lock_main_thread, self.button_semaphore, self,
+                                          self.button_callbacks)
         self.button_thread.start()
 
     def write(self, command: str):
-        with self.button_semaphore:
+        if self.lock_main_thread.is_set():
+            with self.button_semaphore:
+                self.instr.write_str_with_opc(command)
+        else:
             self.instr.write_str_with_opc(command)
 
     def query(self, command: str):
-        with self.button_semaphore:
+        if self.lock_main_thread.is_set():
+            with self.button_semaphore:
+                return self.instr.query_str_with_opc(command)
+        else:
             return self.instr.query_str_with_opc(command)
 
     def greet(self):
@@ -127,10 +136,12 @@ class Instrument:
 
 
 class ButtonThread(threading.Thread):
-    def __init__(self, listen: threading.Event, semaphore: threading.Semaphore, instrument: Instrument,
+    def __init__(self, listen: threading.Event, lock_main_thread: threading.Event, semaphore: threading.Semaphore,
+                 instrument: Instrument,
                  callbacks: dict):
         threading.Thread.__init__(self)
         self.semaphore = semaphore
+        self.lock_main_thread = lock_main_thread
         self.instrument = instrument
         self.callbacks = callbacks
         self.listen = listen
@@ -140,6 +151,8 @@ class ButtonThread(threading.Thread):
             self.listen.wait()
             while self.listen.is_set():
                 with self.semaphore:
+                    self.lock_main_thread.clear()
                     key = self.instrument.button_query()
                     if key is not None:
                         self.callbacks[key]()
+                    self.lock_main_thread.set()
