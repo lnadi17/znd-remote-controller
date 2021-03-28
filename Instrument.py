@@ -40,7 +40,7 @@ class Instrument:
 
     # Button
     def button_define(self, key: Types.ButtonNumber, name: str, callback: Callable):
-        self.write(f"system:user:key {key.value}, 'User {name}'")
+        self.write(f"system:user:key {key.value}, '{name}'")
         self.button_callbacks[key] = callback
 
     def button_query(self) -> Types.ButtonNumber:
