@@ -39,9 +39,9 @@ class Instrument:
         print(f"Instrument installed options: {','.join(self.instr.instrument_options)}")
 
     # Button
-    def button_define(self, key: Types.ButtonNumber, name: str, callback: Callable):
+    def button_define(self, key: Types.ButtonNumber, name: str, callback: Callable, *callback_args: any):
         self.write(f"system:user:key {key.value}, '{name}'")
-        self.button_callbacks[key] = callback
+        self.button_callbacks[key] = lambda: callback(*callback_args)
 
     def button_query(self) -> Types.ButtonNumber:
         key = int(self.query(f"system:user:key?")[0])
