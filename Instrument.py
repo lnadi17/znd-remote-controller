@@ -78,9 +78,7 @@ class Instrument:
         self.write(f"initiate:continuous:all {sweep_mode.value}")
 
     def sweep_set_mode(self, channel: int, sweep_mode: Types.SweepMode):
-        self.write(f"initiate{channel}:continuous {sweep_mode.value}")
 
-    def sweep_initiate(self, channel: int):
         self.write(f"initiate{channel}:immediate:dummy")
 
     def sweep_initiate_all(self):
@@ -126,6 +124,9 @@ class Instrument:
         self.write(
             f"mmemory:store:trace:channel {channel}, '{path}', {formatted}, "
             f"{save_format.value}, {dec_separator.value}, {field_separator.value}")
+
+    def trace_delete_all(self):
+        self.write("calculate:parameter:delete:all")
 
     # Transferring Files
     def transfer_from_instrument(self, source, destination, append_to_destination=False):
