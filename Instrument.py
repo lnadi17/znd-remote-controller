@@ -78,7 +78,9 @@ class Instrument:
         self.write(f"initiate:continuous:all {sweep_mode.value}")
 
     def sweep_set_mode(self, channel: int, sweep_mode: Types.SweepMode):
+        self.write(f"initiate{channel}:continuous {sweep_mode.value}")
 
+    def sweep_initiate(self, channel: int):
         self.write(f"initiate{channel}:immediate:dummy")
 
     def sweep_initiate_all(self):
