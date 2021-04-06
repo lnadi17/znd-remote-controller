@@ -117,6 +117,12 @@ class Instrument:
     def trace_assign_to_window(self, window_id: int, trace_id: int, trace_name: str):
         self.write(f"display:window{window_id}:trace{trace_id}:feed '{trace_name}'")
 
+    def trace_format(self, channel: int, trace_format: Types.TraceFormat):
+        self.write(f"calculate{channel}:format {trace_format.value}")
+
+    def trace_scale_auto(self, trace_id: int):
+        self.write(f"display:trace{trace_id}:y:scale:auto once")
+
     def trace_save_all(self, channel: int, path: 'str',
                        formatted: bool = True,
                        save_format: Types.SaveFormat = Types.SaveFormat.COMPLEX,
