@@ -1,46 +1,60 @@
 import serial
 import io
+import time
 
 
 class Servo:
-    def __init__(self):
-        self.ser = Serial(9600, 'COM1')
-        print("Serial connection: ", self.ser)
+    def __init__(self, port='COM3', baudrate=9600, timeout=10):
+        self.arduino = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+        print("Serial connection: ", self.arduino)
+        print("Note: Any read command will stop reading if the line contains '~' symbol.")
+        print("Note: All occurrences of '~' symbol will be erased.")
+        print(self.read())
+
+    def read_angle(self):
+        return self.query('get').split()[1]
+
+    def start_sweep(self):
+        self.query('start')
+
+    def stop_sweep(self):
+        self.query('stop')
 
     def write_angle(self, angle):
-        self.ser.write("turn around idk whatever the command is")
+        return self.query(f'goto {angle}')
 
-    def read_status(self):
-        self.ser.write("read status")
-        return self.ser.readline()
+    def set_speed(self, speed):
+        return self.query(f'speed {speed}')
 
-
-class Serial:
-    def __init__(self, baudrate, port):
-        self.ser = serial.Serial()
-        self.ser.baudrate = baudrate
-        self.ser.port = port
-        self.ser.open()
-        self.sio = io.TextIOWrapper(io.BufferedRWPair(self.ser, self.ser))
-
-    def open(self):
-        if not self.ser.isOpen():
-            self.ser.open()
-            return True
-        return False
-
-    def close(self):
-        if self.ser.isOpen():
-            self.ser.close()
-            return True
-        return False
-
-    def is_open(self):
-        return self.ser.isOpen()
-
-    def readline(self):
-        return self.sio.readline()
+    def set_range(self, start, stop):
+        return self.query(f'range {start} {stop}')
 
     def write(self, command):
-        self.sio.write(serial.unicode(command))
-        self.sio.flush()
+        self.arduino.write(bytes(command, 'utf-8'))
+
+    def query(self, command):
+        # self.write(command)
+        self.write(command)
+        return self.read()
+
+    def read(self):
+        data = ''
+        while True:
+            line = self.arduino.readline().decode('utf-8')
+            if line == '':
+                break
+            data += str(line)
+            if '~' in line:
+                break
+        return data.replace('~', '')
+
+
+servo = Servo()
+print(servo.read_angle())
+servo.set_range(0, 90)
+servo.set_speed(100)
+servo.write_angle(45)
+servo.start_sweep()
+time.sleep(5)
+servo.stop_sweep()
+
