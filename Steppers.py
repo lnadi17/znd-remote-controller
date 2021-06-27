@@ -16,7 +16,7 @@ class Steppers:
         self.position = (0, 0)
 
     def home(self):
-        self.set_position(0, 0);
+        self.set_position(0, 0)
 
     def get_position(self):
         return self.position
