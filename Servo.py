@@ -1,5 +1,4 @@
 import serial
-import time
 
 
 class Servo:
@@ -45,13 +44,3 @@ class Servo:
             if '~' in line:
                 break
         return data.replace('~', '')
-
-
-servo = Servo()
-print(servo.read_angle())
-servo.set_range(0, 90)
-servo.set_speed(100)
-servo.write_angle(45)
-servo.start_sweep()
-time.sleep(5)
-servo.stop_sweep()
