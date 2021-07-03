@@ -3,6 +3,7 @@
 #define stepPinX 3
 #define dirPinY 4
 #define stepPinY 5
+#define enablePin 6
 #define stepsPerRevolution 200
 
 #define stepsPerMmX 5
@@ -18,14 +19,14 @@ int currentX;
 int currentY;
 
 void moveX(int mm) {
-  if(!mm) return;
-  for(int i = 0; i < stepsPerMmX * abs(mm); i++)
+  if (!mm) return;
+  for (int i = 0; i < stepsPerMmX * abs(mm); i++)
       oneStep(mm > 0 ? clockwise : counterClockwise, motorX);
 }
 
 void moveY(int mm) {
-   if(!mm) return;
-   for(int i = 0; i < stepsPerMmY * abs(mm); i++)
+   if (!mm) return;
+   for (int i = 0; i < stepsPerMmY * abs(mm); i++)
       oneStep(mm > 0 ? clockwise : counterClockwise, motorY);
 }
 
@@ -40,6 +41,14 @@ void oneStep(int dir, int n) {
   delayMicroseconds(100000);
 }
 
+void attach() {
+  digitalWrite(enablePin, LOW);
+}
+
+void detach() {
+  digitalWrite(enablePin, HIGH);
+}
+
 void setup() {
   Serial.begin(9600);
   Serial.println("Program started.");
@@ -51,13 +60,18 @@ void setup() {
   pinMode(dirPinX, OUTPUT);
   pinMode(stepPinY, OUTPUT);
   pinMode(dirPinY, OUTPUT);
+  pinMode(enablePin, OUTPUT);
 }
 
 void loop() {
   if (Serial.available()) {
     String data = Serial.readString();
     Serial.println(data);
-    if (getValue(data, ' ', 0) == "movex") {
+    if (data == "attach") {
+      attach();
+    } else if (data == "detach") {
+      detach();
+    } else if (getValue(data, ' ', 0) == "movex") {
       int moveValue = getValue(data, ' ', 1).toInt();
       moveX(moveValue);
     } else if (getValue(data, ' ', 0) == "movey") {
