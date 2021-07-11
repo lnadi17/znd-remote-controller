@@ -2,7 +2,7 @@ import serial
 
 
 class Servo:
-    def __init__(self, port='COM3', baudrate=9600, timeout=10):
+    def __init__(self, port='COM3', baudrate=9600, timeout=60):
         self.arduino = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
         print("Serial connection: ", self.arduino)
         print("Note: Any read command will stop reading if the line contains '~' symbol.")

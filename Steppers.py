@@ -2,7 +2,7 @@ import serial
 
 
 class Steppers:
-    def __init__(self, port='COM3', baudrate=9600, timeout=10):
+    def __init__(self, port='COM3', baudrate=9600, timeout=60):
         self.home = (0, 0)
         self.position = (0, 0)
         self.max = (1000, 1000)
@@ -24,7 +24,7 @@ class Steppers:
         self.query("attach")
 
     def release(self):
-        self.query("release")
+        self.query("detach")
 
     def reverse_x(self):
         self.x_reversed = not self.x_reversed
@@ -39,7 +39,10 @@ class Steppers:
     def set_max(self):
         self.max = self.position
 
-    def home(self):
+    def set_max(self, x=500, y=800):
+        self.max = (x, y)
+
+    def go_home(self):
         self.set_position(0, 0)
 
     def get_position(self):
@@ -62,7 +65,7 @@ class Steppers:
         mm = mm if not self.x_reversed else -mm
         future_position = (self.position[0] + mm, self.position[1])
         # Don't move if current command gets us out of bounds
-        if not self.ignore_bounds and not (0 < future_position[0] < self.max[0]):
+        if not self.ignore_bounds and not (0 <= future_position[0] <= self.max[0]):
             return
         self.query(f'movex {mm}')
         self.position = future_position
@@ -71,7 +74,7 @@ class Steppers:
         mm = mm if not self.y_reversed else -mm
         future_position = (self.position[0], self.position[1] + mm)
         # Don't move if current command gets us out of bounds
-        if not self.ignore_bounds and not (0 < future_position[1] < self.max[1]):
+        if not self.ignore_bounds and not (0 <= future_position[1] <= self.max[1]):
             return
         self.query(f'movey {mm}')
         self.position = future_position
