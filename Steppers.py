@@ -36,9 +36,6 @@ class Steppers:
         self.home = self.position
         self.position = (0, 0)
 
-    def set_max(self):
-        self.max = self.position
-
     def set_max(self, x=500, y=800):
         self.max = (x, y)
 
