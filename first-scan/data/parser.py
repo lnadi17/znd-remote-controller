@@ -1,7 +1,5 @@
 import os
-import numpy as np
 
-is_first = True
 for file in os.listdir():
     if '.dat' not in file:
         continue
