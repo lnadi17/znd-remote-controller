@@ -2,7 +2,7 @@ import serial
 
 
 class Steppers:
-    def __init__(self, port='COM3', baudrate=9600, timeout=60):
+    def __init__(self, port='COM3', baudrate=2000000, timeout=60):
         self.home = (0, 0)
         self.position = (0, 0)
         self.max = (1000, 1000)

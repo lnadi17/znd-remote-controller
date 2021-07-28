@@ -50,7 +50,7 @@ void detach() {
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(2000000);
   Serial.println("Program started.");
   Serial.println("=====================");
   Serial.println("Available commands:\n1. movex\n2. movey");
