@@ -27,7 +27,7 @@ was created which used all these python classes to implement custom automation p
 `notebooks` folder contains initial attempts to filter and use the data, but the code may not be applicable to other use cases. This is 
 the picture of the setup that was supported by this software:
 
-<img src="https://github.com/lnadi17/znd-remote-controller/assets/19193250/b283769e-12a8-4702-8cb6-23c299c79e40" width="400">
+<img src="https://github.com/lnadi17/znd-remote-controller/assets/19193250/5adfd347-789b-472f-bd31-588493c1133d" width="400">
 
 ## Further Development
 
