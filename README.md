@@ -32,5 +32,5 @@ the picture of the setup that was supported by this software:
 ## Further Development
 
 This project is closely connected to my Junior Project at University, [ground-penetrating-radar](https://github.com/lnadi17/ground-penetrating-radar), 
-which involved creating AI models using GPR data, but didn't involve that much data collection. This project is archived and no further 
+which involved creating AI models using GPR data, but didn't involve this much data collection. This project is archived and no further 
 development is planned. Feel free to explore the repository and use the code for yourself.
