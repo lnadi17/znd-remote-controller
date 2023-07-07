@@ -29,7 +29,7 @@ the picture of the setup that was supported by this software:
 
 <img src="https://github.com/lnadi17/znd-remote-controller/assets/19193250/b283769e-12a8-4702-8cb6-23c299c79e40" width="400">
 
-## More Info
+## Further Development
 
 This project is closely connected to my Junior Project at University, [ground-penetrating-radar](https://github.com/lnadi17/ground-penetrating-radar), 
 which involved creating AI models using GPR data, but didn't involve that much data collection. This project is archived and no further 
